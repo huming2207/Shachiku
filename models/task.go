@@ -11,8 +11,9 @@ type Task struct {
 	Location    string		`gorm:"column:location"`
 	Owner		User		`gorm:"foreignkey:OwnerID"`
 	OwnerID		uint
-	Attendees   []*User 	`gorm:"many2many:user_task;"`
+	Attendees   []*User 	`gorm:"many2many:users_tasks;"`
 	StartAt     time.Time	`gorm:"column:start_at"`
 	EndAt		time.Time	`gorm:"column:end_at"`
 	Comment     string		`gorm:"column:comment"`
+	Tags		[]*Tag		`gorm:"many2many:users_tags"`
 }

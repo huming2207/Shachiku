@@ -13,7 +13,7 @@ type User struct {
 	Bio      string  `gorm:"column:bio;size:1024"`
 	Image    *string `gorm:"column:image"`
 	Password string  `gorm:"column:password;not null"`
-	Tasks	 []*Task `gorm:"many2many:user_task;"`
+	Tasks	 []*Task `gorm:"many2many:users_tasks;"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
