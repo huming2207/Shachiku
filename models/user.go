@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
-	"shachiku/common"
 )
 
 type User struct {
@@ -14,6 +13,7 @@ type User struct {
 	Bio      string  `gorm:"column:bio;size:1024"`
 	Image    *string `gorm:"column:image"`
 	Password string  `gorm:"column:password;not null"`
+	Tasks	 []*Task `gorm:"many2many:user_task;"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
@@ -35,11 +35,11 @@ func (ctx *User) Update() *gorm.DB {
 
 func FindOneUser(query interface{}) (User, error) {
 	var user User
-	db := common.GetDb()
+	db := GetDb()
 	err := db.Where(query).First(&user).Error
 	return user, err
 }
 
 func DeleteUser(query interface{}) error {
-	return common.GetDb().Where(query).Delete(User{}).Error
+	return GetDb().Where(query).Delete(User{}).Error
 }
