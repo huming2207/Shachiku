@@ -7,13 +7,13 @@ import (
 
 type Task struct {
 	gorm.Model
-	Title		string		`gorm:"column:title"`
-	Location    string		`gorm:"column:location"`
-	Owner		User		`gorm:"foreignkey:OwnerID"`
-	OwnerID		uint
-	Attendees   []*User 	`gorm:"many2many:users_tasks;"`
-	StartAt     time.Time	`gorm:"column:start_at"`
-	EndAt		time.Time	`gorm:"column:end_at"`
-	Comment     string		`gorm:"column:comment"`
-	Tags		[]*Tag		`gorm:"many2many:users_tags"`
+	Title     string `gorm:"column:title;not null"`
+	Location  string `gorm:"column:location"`
+	Owner     User   `gorm:"foreignkey:OwnerID"`
+	OwnerID   uint
+	Attendees []*User   `gorm:"many2many:users_tasks;"`
+	StartAt   time.Time `gorm:"column:start_at;not null"`
+	EndAt     time.Time `gorm:"column:end_at"`
+	Comment   string    `gorm:"column:comment"`
+	Tags      []*Tag    `gorm:"many2many:users_tags"`
 }
