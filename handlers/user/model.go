@@ -1,19 +1,21 @@
-package models
+package user
 
 import (
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
+	"shachiku/common"
+	"shachiku/handlers/task"
 )
 
 type User struct {
 	gorm.Model
-	Username string  `gorm:"column:username"`
-	Email    string  `gorm:"column:email;unique_index"`
-	Bio      string  `gorm:"column:bio;size:1024"`
-	Image    *string `gorm:"column:image"`
-	Password string  `gorm:"column:password;not null"`
-	Tasks	 []*Task `gorm:"many2many:users_tasks;"`
+	Username string       `gorm:"column:username"`
+	Email    string       `gorm:"column:email;unique_index"`
+	Bio      string       `gorm:"column:bio;size:1024"`
+	Image    *string      `gorm:"column:image"`
+	Password string       `gorm:"column:password;not null"`
+	Tasks    []*task.Task `gorm:"many2many:users_tasks;"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
@@ -30,16 +32,16 @@ func (ctx *User) CheckPassword(pass string) (match bool, err error) {
 }
 
 func (ctx *User) Update() *gorm.DB {
-	return db.Save(&ctx)
+	return common.GetDb().Save(&ctx)
 }
 
 func FindOneUser(query interface{}) (User, error) {
 	var user User
-	db := GetDb()
+	db := common.GetDb()
 	err := db.Where(query).First(&user).Error
 	return user, err
 }
 
 func DeleteUser(query interface{}) error {
-	return GetDb().Where(query).Delete(User{}).Error
+	return common.GetDb().Where(query).Delete(User{}).Error
 }

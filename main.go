@@ -1,13 +1,11 @@
-package shachiku
+package main
 
 import (
-	"github.com/joho/godotenv"
 	"log"
+	"shachiku/common"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalln("Failed to load configuration: %w", err)
-	}
+	db := common.GetDb()
+	log.Println(db)
 }
