@@ -2,12 +2,26 @@ package user
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	validation "github.com/go-ozzo/ozzo-validation/v3"
+	"github.com/go-ozzo/ozzo-validation/v3/is"
 	"github.com/labstack/echo"
+	"gopkg.in/ini.v1"
+	"log"
 	"net/http"
 	"shachiku/common"
+	"time"
 )
 
+var jwtConfig *ini.Section
+
 func RegisterHandler(rtGroup *echo.Group) {
+	var err error
+	jwtConfig, err = common.GetConfig().GetSection(common.JwtSection)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	rtGroup.Group("/user")
 	{
 		rtGroup.POST("/login", login)
@@ -17,7 +31,56 @@ func RegisterHandler(rtGroup *echo.Group) {
 }
 
 func login(ctx echo.Context) error {
-	return nil
+	username := ctx.FormValue("username")
+	password := ctx.FormValue("password")
+
+	// Check empty or not
+	if username == "" || password == "" {
+		return ctx.JSON(http.StatusBadRequest, common.JSON{
+			"msg": "Empty or invalid request",
+		})
+	}
+
+	// Find user by user name or email
+	user := &User{}
+	db := common.GetDb()
+	db.First(&user, "username = ? OR email = ?", username, username)
+
+	// Validate password
+	match, err := user.CheckPassword(password)
+	if err != nil {
+		return err
+	}
+
+	if !match {
+		return ctx.JSON(http.StatusUnauthorized, common.JSON{
+			"msg": "Password incorrect",
+		})
+	}
+
+	// Setup claims
+	expiresAt := time.Now().Add(time.Hour).Unix()
+	claims := &common.JwtUserClaims{
+		UserName: username,
+		UserID:   user.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expiresAt,
+		},
+	}
+
+	// Generate JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	var tokenStr string
+	tokenStr, err = token.SignedString(jwtConfig.Key(common.JwtSecret).String())
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusUnauthorized, common.JSON{
+		"msg":     "",
+		"token":   tokenStr,
+		"expires": expiresAt,
+	})
 }
 
 func register(ctx echo.Context) error {
@@ -29,30 +92,36 @@ func register(ctx echo.Context) error {
 
 	passwordStr := ctx.FormValue("password")
 
-	if user.Email == "" || passwordStr == "" || user.Username == "" {
-		err = ctx.JSON(http.StatusBadRequest, common.JSON{
-			"err": "Empty field detected",
+	// Validate user name
+	err = validation.Validate(user.Username, validation.Required, validation.Length(3, 50))
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, common.JSON{
+			"msg": fmt.Sprint(err),
 		})
+	}
 
-		if err != nil {
-			return err
-		}
+	// Validate password
+	err = validation.Validate(passwordStr, validation.Required, validation.Length(6, 64))
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, common.JSON{
+			"msg": fmt.Sprint(err),
+		})
+	}
 
-		return nil
+	// Validate email
+	err = validation.Validate(user.Email, validation.Required, is.Email)
+	if err != nil {
+		return ctx.JSON(http.StatusUnauthorized, common.JSON{
+			"msg": fmt.Sprint(err),
+		})
 	}
 
 	// Generate password hash
 	err = user.SetPassword(passwordStr)
 	if err != nil {
-		err = ctx.JSON(http.StatusInternalServerError, common.JSON{
+		return ctx.JSON(http.StatusInternalServerError, common.JSON{
 			"err": fmt.Sprintf("Failed to set password: %v", err),
 		})
-
-		if err != nil {
-			return err
-		}
-
-		return nil
 	}
 
 	// Create user
