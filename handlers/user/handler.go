@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"shachiku/common"
+	"shachiku/models"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func login(ctx echo.Context) error {
 	}
 
 	// Find user by user name or email
-	user := &User{}
+	user := &models.User{}
 	db := common.GetDb()
 	db.First(&user, "username = ? OR email = ?", username, username)
 
@@ -84,7 +85,7 @@ func login(ctx echo.Context) error {
 }
 
 func register(ctx echo.Context) error {
-	user := &User{}
+	user := &models.User{}
 	err := ctx.Bind(&user)
 	if err != nil {
 		return err
@@ -129,8 +130,8 @@ func register(ctx echo.Context) error {
 	db.Create(&user)
 
 	// Query again to get the ID
-	createdUser := &User{}
-	db.Where(&User{Username: user.Username, Email: user.Email}).First(&createdUser)
+	createdUser := &models.User{}
+	db.Where(&models.User{Username: user.Username, Email: user.Email}).First(&createdUser)
 
 	// Reply with query result
 	err = ctx.JSON(http.StatusOK, createdUser)

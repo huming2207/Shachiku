@@ -1,21 +1,20 @@
-package user
+package models
 
 import (
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
 	"shachiku/common"
-	"shachiku/handlers/task"
 )
 
 type User struct {
 	gorm.Model
-	Username string       `gorm:"column:username;unique_index;not null" form:"username" query:"username" json:"username"`
-	Email    string       `gorm:"column:email;unique_index;not null" form:"email" query:"email" json:"email"`
-	Bio      string       `gorm:"column:bio;size:1024" json:"bio"`
-	Image    *string      `gorm:"column:image" json:"image"`
-	Password string       `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
-	Tasks    []*task.Task `gorm:"many2many:users_tasks;" json:"tasks"`
+	Username string  `gorm:"column:username;unique_index;not null" form:"username" query:"username" json:"username"`
+	Email    string  `gorm:"column:email;unique_index;not null" form:"email" query:"email" json:"email"`
+	Bio      string  `gorm:"column:bio;size:1024" json:"bio"`
+	Image    *string `gorm:"column:image" json:"image"`
+	Password string  `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
+	Tasks    []*Task `gorm:"many2many:users_tasks;" json:"tasks"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
