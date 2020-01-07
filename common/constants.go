@@ -10,3 +10,11 @@ const (
 	DatabasePassword string = "password"
 	DatabaseName     string = "name"
 )
+
+const (
+	JwtSection    string = "jwt"
+	JwtSecret     string = "secret"
+	JwtSignMethod string = "crypto"
+)
+
+type JSON map[string]interface{}

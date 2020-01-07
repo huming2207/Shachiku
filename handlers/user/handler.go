@@ -2,12 +2,12 @@ package user
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo"
 	"net/http"
 	"shachiku/common"
 )
 
-func RegisterHandler(rtGroup *gin.RouterGroup) {
+func RegisterHandler(rtGroup *echo.Group) {
 	rtGroup.Group("/user")
 	{
 		rtGroup.POST("/login", login)
@@ -16,32 +16,43 @@ func RegisterHandler(rtGroup *gin.RouterGroup) {
 	}
 }
 
-func login(ctx *gin.Context) {
-
+func login(ctx echo.Context) error {
+	return nil
 }
 
-func register(ctx *gin.Context) {
-	userName := ctx.PostForm("username")
-	password := ctx.PostForm("password")
-	email := ctx.PostForm("email")
-
-	if userName == "" || password == "" || email == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"err": "Empty field detected",
-		})
+func register(ctx echo.Context) error {
+	user := &User{}
+	err := ctx.Bind(&user)
+	if err != nil {
+		return err
 	}
 
-	user := &User{
-		Username: userName,
-		Email:    email,
+	passwordStr := ctx.FormValue("password")
+
+	if user.Email == "" || passwordStr == "" || user.Username == "" {
+		err = ctx.JSON(http.StatusBadRequest, common.JSON{
+			"err": "Empty field detected",
+		})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	// Generate password hash
-	err := user.SetPassword(password)
+	err = user.SetPassword(passwordStr)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		err = ctx.JSON(http.StatusInternalServerError, common.JSON{
 			"err": fmt.Sprintf("Failed to set password: %v", err),
 		})
+
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	// Create user
@@ -50,16 +61,18 @@ func register(ctx *gin.Context) {
 
 	// Query again to get the ID
 	createdUser := &User{}
-	db.Where(&User{Username: userName, Email: email}).First(&createdUser)
+	db.Where(&User{Username: user.Username, Email: user.Email}).First(&createdUser)
 
 	// Reply with query result
-	ctx.JSON(http.StatusOK, gin.H{
-		"id":        createdUser.ID,
-		"user_name": userName,
-		"email":     email,
-	})
+	err = ctx.JSON(http.StatusOK, createdUser)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func changePassword(ctx *gin.Context) {
-
+func changePassword(ctx echo.Context) error {
+	return nil
 }
