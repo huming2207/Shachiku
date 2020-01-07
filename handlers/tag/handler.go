@@ -1,14 +1,14 @@
 package tag
 
-import "github.com/gin-gonic/gin"
+import "github.com/labstack/echo"
 
-func RegisterTask(rtGroup *gin.RouterGroup) {
+func RegisterTask(rtGroup *echo.Group) {
 	rtGroup.Group("/tag")
 	{
 		rtGroup.GET("/", listTags)
 	}
 }
 
-func listTags(ctx *gin.Context) {
-
+func listTags(ctx echo.Context) error {
+	return nil
 }

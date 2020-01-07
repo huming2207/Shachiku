@@ -1,8 +1,8 @@
 package task
 
-import "github.com/gin-gonic/gin"
+import "github.com/labstack/echo"
 
-func RegisterTask(rtGroup *gin.RouterGroup) {
+func RegisterTask(rtGroup *echo.Group) {
 	rtGroup.Group("/task")
 	{
 		rtGroup.POST("/", addTask)
@@ -12,18 +12,18 @@ func RegisterTask(rtGroup *gin.RouterGroup) {
 	}
 }
 
-func addTask(ctx *gin.Context) {
-
+func addTask(ctx echo.Context) error {
+	return nil
 }
 
-func getTaskList(ctx *gin.Context) {
-
+func getTaskList(ctx echo.Context) error {
+	return nil
 }
 
-func getTaskDetail(ctx *gin.Context) {
-
+func getTaskDetail(ctx echo.Context) error {
+	return nil
 }
 
-func removeTask(ctx *gin.Context) {
-
+func removeTask(ctx echo.Context) error {
+	return nil
 }
