@@ -10,8 +10,8 @@ import (
 
 type User struct {
 	gorm.Model
-	Username string       `gorm:"column:username"`
-	Email    string       `gorm:"column:email;unique_index"`
+	Username string       `gorm:"column:username;unique_index;not null"`
+	Email    string       `gorm:"column:email;unique_index;not null"`
 	Bio      string       `gorm:"column:bio;size:1024"`
 	Image    *string      `gorm:"column:image"`
 	Password string       `gorm:"column:password;not null"`
