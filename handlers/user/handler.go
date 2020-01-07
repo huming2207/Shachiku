@@ -61,7 +61,7 @@ func login(ctx echo.Context) error {
 
 	// Setup claims
 	expiresAt := time.Now().Add(time.Hour).Unix()
-	claims := &common.JwtUserClaims{
+	claims := &models.JwtUserClaims{
 		UserName: username,
 		UserID:   user.ID,
 		StandardClaims: jwt.StandardClaims{

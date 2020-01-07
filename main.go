@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"log"
 	"shachiku/common"
+	"shachiku/models"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	router.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:    []byte(config.Key(common.JwtSecret).String()),
 		SigningMethod: config.Key(common.JwtSignMethod).String(),
-		Claims:        common.JwtUserClaims{},
+		Claims:        models.JwtUserClaims{},
 		ContextKey:    "user",
 		TokenLookup:   "header:" + echo.HeaderAuthorization,
 		AuthScheme:    "Bearer",
