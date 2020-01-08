@@ -1,4 +1,4 @@
-package user
+package login
 
 import (
 	"fmt"
@@ -16,19 +16,17 @@ import (
 
 var jwtConfig *ini.Section
 
-func RegisterHandler(rtGroup *echo.Group) {
+func RegisterHandler(router *echo.Echo) {
 	var err error
 	jwtConfig, err = common.GetConfig().GetSection(common.JwtSection)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	rtGroup.Group("/user")
-	{
-		rtGroup.POST("/login", login)
-		rtGroup.POST("/register", register)
-		rtGroup.POST("/password", changePassword)
-	}
+	group := router.Group("/user")
+
+	group.POST("/register", register)
+	group.POST("/login", login)
 }
 
 func login(ctx echo.Context) error {
@@ -140,9 +138,5 @@ func register(ctx echo.Context) error {
 		return err
 	}
 
-	return nil
-}
-
-func changePassword(ctx echo.Context) error {
 	return nil
 }

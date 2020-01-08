@@ -2,7 +2,7 @@ package task
 
 import "github.com/labstack/echo"
 
-func RegisterTask(rtGroup *echo.Group) {
+func RegisterTask(rtGroup *echo.Echo) {
 	rtGroup.Group("/task")
 	{
 		rtGroup.POST("/", addTask)

@@ -2,7 +2,7 @@ package tag
 
 import "github.com/labstack/echo"
 
-func RegisterTask(rtGroup *echo.Group) {
+func RegisterTask(rtGroup *echo.Echo) {
 	rtGroup.Group("/tag")
 	{
 		rtGroup.GET("/", listTags)
