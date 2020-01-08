@@ -1,16 +1,6 @@
-package task
+package portal
 
 import "github.com/labstack/echo"
-
-func RegisterTask(rtGroup *echo.Echo) {
-	rtGroup.Group("/task")
-	{
-		rtGroup.POST("/", addTask)
-		rtGroup.GET("/", getTaskList)
-		rtGroup.GET("/:taskId", getTaskDetail)
-		rtGroup.DELETE("/:taskId", removeTask)
-	}
-}
 
 func addTask(ctx echo.Context) error {
 	return nil

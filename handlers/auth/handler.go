@@ -23,7 +23,7 @@ func RegisterHandler(router *echo.Echo) {
 		log.Fatalln(err)
 	}
 
-	group := router.Group("/user")
+	group := router.Group("/auth")
 
 	group.POST("/register", register)
 	group.POST("/login", login)
@@ -40,7 +40,7 @@ func login(ctx echo.Context) error {
 		})
 	}
 
-	// Find user by user name or email
+	// Find auth by auth name or email
 	user := &models.User{}
 	db := common.GetDb()
 	db.First(&user, "username = ? OR email = ?", username, username)
@@ -91,7 +91,7 @@ func register(ctx echo.Context) error {
 
 	passwordStr := ctx.FormValue("password")
 
-	// Validate user name
+	// Validate auth name
 	err = validation.Validate(user.Username, validation.Required, validation.Length(3, 50))
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, common.JSON{
@@ -123,7 +123,7 @@ func register(ctx echo.Context) error {
 		})
 	}
 
-	// Create user
+	// Create auth
 	db := common.GetDb()
 	db.Create(&user)
 
