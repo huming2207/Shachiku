@@ -26,7 +26,7 @@ func RegisterHandler(router *echo.Echo) {
 		SigningKey:    []byte(jwtConfig.Key(common.JwtSecret).String()),
 		SigningMethod: jwtConfig.Key(common.JwtSignMethod).String(),
 		Claims:        &models.JwtUserClaims{},
-		ContextKey:    "user",
+		ContextKey:    common.JwtSection,
 		TokenLookup:   "header:" + echo.HeaderAuthorization,
 		AuthScheme:    "Bearer",
 	}))
@@ -43,11 +43,10 @@ func RegisterHandler(router *echo.Echo) {
 	taskGroup.GET("/", getTaskList)
 	taskGroup.GET("/:taskId", getTaskDetail)
 	taskGroup.DELETE("/:taskId", removeTask)
-
 }
 
 func changePassword(ctx echo.Context) error {
-	token := ctx.Get("user").(*jwt.Token)
+	token := ctx.Get(common.JwtSection).(*jwt.Token)
 	claims := token.Claims.(*models.JwtUserClaims)
 
 	db := common.GetDb()
