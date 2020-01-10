@@ -1,4 +1,4 @@
-package login
+package auth
 
 import (
 	"fmt"
@@ -36,13 +36,13 @@ func login(ctx echo.Context) error {
 	// Check empty or not
 	if username == "" || password == "" {
 		return ctx.JSON(http.StatusBadRequest, common.JSON{
-			"msg": "Empty or invalid request",
+			"message": "Empty or invalid request",
 		})
 	}
 
 	// Find auth by auth name or email
 	user := &models.User{}
-	db := common.GetDb()
+	db := models.GetDb()
 	db.First(&user, "username = ? OR email = ?", username, username)
 
 	// Validate password
@@ -53,7 +53,7 @@ func login(ctx echo.Context) error {
 
 	if !match {
 		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"msg": "Password incorrect",
+			"message": "Password incorrect",
 		})
 	}
 
@@ -76,26 +76,22 @@ func login(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusUnauthorized, common.JSON{
-		"msg":     "",
+		"message": "",
 		"token":   tokenStr,
 		"expires": expiresAt,
 	})
 }
 
 func register(ctx echo.Context) error {
-	user := &models.User{}
-	err := ctx.Bind(&user)
-	if err != nil {
-		return err
-	}
-
+	username := ctx.FormValue("username")
+	email := ctx.FormValue("email")
 	passwordStr := ctx.FormValue("password")
 
 	// Validate auth name
-	err = validation.Validate(user.Username, validation.Required, validation.Length(3, 50))
+	err := validation.Validate(username, validation.Required, validation.Length(3, 50))
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"msg": fmt.Sprint(err),
+			"message": fmt.Sprint(err),
 		})
 	}
 
@@ -103,28 +99,29 @@ func register(ctx echo.Context) error {
 	err = validation.Validate(passwordStr, validation.Required, validation.Length(6, 64))
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"msg": fmt.Sprint(err),
+			"message": fmt.Sprint(err),
 		})
 	}
 
 	// Validate email
-	err = validation.Validate(user.Email, validation.Required, is.Email)
+	err = validation.Validate(email, validation.Required, is.Email)
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"msg": fmt.Sprint(err),
+			"message": fmt.Sprint(err),
 		})
 	}
 
 	// Generate password hash
+	user := &models.User{Username: username, Email: email}
 	err = user.SetPassword(passwordStr)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.JSON{
-			"err": fmt.Sprintf("Failed to set password: %v", err),
+			"message": fmt.Sprintf("Failed to set password: %v", err),
 		})
 	}
 
 	// Create auth
-	db := common.GetDb()
+	db := models.GetDb()
 	db.Create(&user)
 
 	// Query again to get the ID
