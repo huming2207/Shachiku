@@ -49,7 +49,7 @@ func changePassword(ctx echo.Context) error {
 	token := ctx.Get(common.JwtSection).(*jwt.Token)
 	claims := token.Claims.(*models.JwtUserClaims)
 
-	db := common.GetDb()
+	db := models.GetDb()
 	user := &models.User{}
 	db.First(&user, claims.UserID)
 
