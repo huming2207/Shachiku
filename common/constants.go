@@ -17,4 +17,9 @@ const (
 	JwtSignMethod string = "crypto"
 )
 
+const (
+	ServerSection string = "server"
+	ServerListen  string = "listen"
+)
+
 type JSON map[string]interface{}

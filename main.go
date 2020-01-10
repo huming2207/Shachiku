@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"log"
+	"shachiku/common"
 	"shachiku/handlers/auth"
 	"shachiku/handlers/portal"
 )
@@ -18,7 +19,8 @@ func main() {
 	auth.RegisterHandler(router)
 	portal.RegisterHandler(router)
 
-	err := router.Start("0.0.0.0:3000")
+	serverConfig := common.GetConfig().Section(common.ServerSection)
+	err := router.Start(serverConfig.Key(common.ServerListen).String())
 	if err != nil {
 		log.Panicln(err)
 	}
