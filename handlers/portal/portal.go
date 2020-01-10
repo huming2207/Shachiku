@@ -2,8 +2,8 @@ package portal
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gopkg.in/ini.v1"
 	"log"
 	"net/http"

@@ -5,7 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	validation "github.com/go-ozzo/ozzo-validation/v3"
 	"github.com/go-ozzo/ozzo-validation/v3/is"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"gopkg.in/ini.v1"
 	"log"
 	"net/http"

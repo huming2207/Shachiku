@@ -1,6 +1,6 @@
 package portal
 
-import "github.com/labstack/echo"
+import "github.com/labstack/echo/v4"
 
 func listTags(ctx echo.Context) error {
 	return nil

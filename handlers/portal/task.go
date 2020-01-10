@@ -1,6 +1,8 @@
 package portal
 
-import "github.com/labstack/echo"
+import (
+	"github.com/labstack/echo/v4"
+)
 
 func addTask(ctx echo.Context) error {
 	return nil
