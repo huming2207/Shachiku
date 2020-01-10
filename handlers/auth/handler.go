@@ -70,13 +70,13 @@ func login(ctx echo.Context) error {
 	// Generate JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	var tokenStr string
-	tokenStr, err = token.SignedString(jwtConfig.Key(common.JwtSecret).String())
+	tokenStr, err = token.SignedString([]byte(jwtConfig.Key(common.JwtSecret).String()))
 	if err != nil {
 		return err
 	}
 
-	return ctx.JSON(http.StatusUnauthorized, common.JSON{
-		"message": "",
+	return ctx.JSON(http.StatusOK, common.JSON{
+		"message": "OK",
 		"token":   tokenStr,
 		"expires": expiresAt,
 	})
