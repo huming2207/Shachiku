@@ -36,6 +36,9 @@ func RegisterHandler(router *echo.Echo) {
 	// Tag group
 	tagGroup := group.Group("/tag")
 	tagGroup.GET("/", listTags)
+	tagGroup.GET("/:tagId", listTagDetail)
+	tagGroup.POST("/", addTag)
+	tagGroup.DELETE("/:tagId", deleteTag)
 
 	// Task group
 	taskGroup := group.Group("/task")
