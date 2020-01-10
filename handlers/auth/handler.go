@@ -130,7 +130,6 @@ func register(ctx echo.Context) error {
 
 	// Reply with query result
 	err = ctx.JSON(http.StatusOK, createdUser)
-
 	if err != nil {
 		return err
 	}

@@ -24,7 +24,7 @@ func RegisterHandler(router *echo.Echo) {
 
 	group.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:    []byte(jwtConfig.Key(common.JwtSecret).String()),
-		SigningMethod: jwtConfig.Key(common.JwtSignMethod).String(),
+		SigningMethod: "HS512",
 		Claims:        &models.JwtUserClaims{},
 		ContextKey:    common.JwtSection,
 		TokenLookup:   "header:" + echo.HeaderAuthorization,
@@ -57,8 +57,9 @@ func changePassword(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
+	db.Save(&user)
 
 	return ctx.JSON(http.StatusOK, common.JSON{
-		"msg": "Password updated",
+		"message": "Password updated",
 	})
 }
