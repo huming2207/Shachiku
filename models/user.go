@@ -4,13 +4,12 @@ import (
 	"errors"
 	"github.com/alexedwards/argon2id"
 	"github.com/jinzhu/gorm"
-	"shachiku/common"
 )
 
 type User struct {
 	gorm.Model
-	Username string  `gorm:"column:username;unique_index;not null" form:"username" query:"username" json:"username"`
-	Email    string  `gorm:"column:email;unique_index;not null" form:"email" query:"email" json:"email"`
+	Username string  `gorm:"column:username;unique_index;not null" json:"username"`
+	Email    string  `gorm:"column:email;unique_index;not null" json:"email"`
 	Bio      string  `gorm:"column:bio;size:1024" json:"bio"`
 	Image    *string `gorm:"column:image" json:"image"`
 	Password string  `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
@@ -31,16 +30,16 @@ func (ctx *User) CheckPassword(pass string) (match bool, err error) {
 }
 
 func (ctx *User) Update() *gorm.DB {
-	return common.GetDb().Save(&ctx)
+	return GetDb().Save(&ctx)
 }
 
 func FindOneUser(query interface{}) (User, error) {
 	var user User
-	db := common.GetDb()
+	db := GetDb()
 	err := db.Where(query).First(&user).Error
 	return user, err
 }
 
 func DeleteUser(query interface{}) error {
-	return common.GetDb().Where(query).Delete(User{}).Error
+	return GetDb().Where(query).Delete(User{}).Error
 }
