@@ -76,5 +76,6 @@ func GetDb() *gorm.DB {
 		log.Println("Task table exists, skip creating...")
 	}
 
+	db.LogMode(true)
 	return db
 }
