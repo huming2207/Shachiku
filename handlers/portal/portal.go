@@ -63,7 +63,7 @@ func changePassword(ctx echo.Context) error {
 	}
 	db.Save(&user)
 
-	return ctx.JSON(http.StatusOK, common.JSON{
+	return ctx.JSON(http.StatusOK, common.J{
 		"message": "Password updated",
 	})
 }
@@ -81,5 +81,5 @@ func getUser(ctx echo.Context) error {
 		return err
 	}
 
-	return ctx.JSON(http.StatusOK, &user)
+	return ctx.JSON(http.StatusOK, user)
 }

@@ -12,9 +12,8 @@ const (
 )
 
 const (
-	JwtSection    string = "jwt"
-	JwtSecret     string = "secret"
-	JwtSignMethod string = "crypto"
+	JwtSection string = "jwt"
+	JwtSecret  string = "secret"
 )
 
 const (
@@ -22,4 +21,4 @@ const (
 	ServerListen  string = "listen"
 )
 
-type JSON map[string]interface{}
+type J map[string]interface{}

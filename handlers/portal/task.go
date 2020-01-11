@@ -1,6 +1,7 @@
 package portal
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -17,7 +18,7 @@ func addTask(ctx echo.Context) error {
 
 	// Validate title
 	if title == "" {
-		return ctx.JSON(http.StatusBadRequest, common.JSON{
+		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Title can't be empty",
 		})
 	}
@@ -25,12 +26,16 @@ func addTask(ctx echo.Context) error {
 	// Retrieve start_at and end_at times
 	startAtTs, err := strconv.ParseInt(ctx.FormValue("start_at"), 10, 64)
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to parse start time",
+		})
 	}
 
 	endAtTs, err := strconv.ParseInt(ctx.FormValue("end_at"), 10, 64)
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to parse end time",
+		})
 	}
 
 	startAt := time.Unix(startAtTs, 0)
@@ -53,13 +58,19 @@ func addTask(ctx echo.Context) error {
 
 	err = db.Save(&task).Error
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to save task to database",
+		})
 	}
 
-	return ctx.JSON(http.StatusOK, common.JSON{
-		"message": "ok",
-		"task":    task,
-	})
+	err = task.LoadOwner()
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to assign owner",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, task)
 }
 
 func getAllTasks(ctx echo.Context) error {
@@ -67,17 +78,21 @@ func getAllTasks(ctx echo.Context) error {
 	db := models.GetDb()
 	err := db.Find(&tasks).Error
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Failed to load tasks",
+		})
 	}
 
 	for idx, _ := range *tasks {
 		err = (*tasks)[idx].LoadOwner()
 		if err != nil {
-			return err
+			return ctx.JSON(http.StatusInternalServerError, common.J{
+				"message": "Failed to load owner",
+			})
 		}
 	}
 
-	return ctx.JSON(http.StatusOK, &tasks)
+	return ctx.JSON(http.StatusOK, tasks)
 }
 
 func getOneTask(ctx echo.Context) error {
@@ -87,15 +102,19 @@ func getOneTask(ctx echo.Context) error {
 
 	err := db.First(&task, taskId).Error
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusNotFound, common.J{
+			"message": fmt.Sprintf("Task ID %s was not found", taskId),
+		})
 	}
 
 	err = task.LoadOwner()
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusNotFound, common.J{
+			"message": "Failed to load owner",
+		})
 	}
 
-	return ctx.JSON(http.StatusOK, &task)
+	return ctx.JSON(http.StatusOK, task)
 }
 
 func removeTask(ctx echo.Context) error {
@@ -105,8 +124,10 @@ func removeTask(ctx echo.Context) error {
 
 	err := db.Delete(&task, taskId).Error
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": fmt.Sprintf("Failed to delete task %s", taskId),
+		})
 	}
 
-	return ctx.JSON(http.StatusOK, &task)
+	return ctx.JSON(http.StatusOK, task)
 }

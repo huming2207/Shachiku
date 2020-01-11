@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	validation "github.com/go-ozzo/ozzo-validation/v3"
 	"github.com/go-ozzo/ozzo-validation/v3/is"
@@ -35,7 +34,7 @@ func login(ctx echo.Context) error {
 
 	// Check empty or not
 	if username == "" || password == "" {
-		return ctx.JSON(http.StatusBadRequest, common.JSON{
+		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Empty or invalid request",
 		})
 	}
@@ -52,7 +51,7 @@ func login(ctx echo.Context) error {
 	}
 
 	if !match {
-		return ctx.JSON(http.StatusUnauthorized, common.JSON{
+		return ctx.JSON(http.StatusUnauthorized, common.J{
 			"message": "Password incorrect",
 		})
 	}
@@ -75,7 +74,7 @@ func login(ctx echo.Context) error {
 		return err
 	}
 
-	return ctx.JSON(http.StatusOK, common.JSON{
+	return ctx.JSON(http.StatusOK, common.J{
 		"message": "OK",
 		"token":   tokenStr,
 		"expires": expiresAt,
@@ -90,24 +89,24 @@ func register(ctx echo.Context) error {
 	// Validate auth name
 	err := validation.Validate(username, validation.Required, validation.Length(3, 50))
 	if err != nil {
-		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"message": fmt.Sprint(err),
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"error": "Username is invalid",
 		})
 	}
 
 	// Validate password
 	err = validation.Validate(passwordStr, validation.Required, validation.Length(6, 64))
 	if err != nil {
-		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"message": fmt.Sprint(err),
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"error": "Password must be between 6 to 64 characters",
 		})
 	}
 
 	// Validate email
 	err = validation.Validate(email, validation.Required, is.Email)
 	if err != nil {
-		return ctx.JSON(http.StatusUnauthorized, common.JSON{
-			"message": fmt.Sprint(err),
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"error": "Email address is invalid",
 		})
 	}
 
@@ -115,24 +114,24 @@ func register(ctx echo.Context) error {
 	user := &models.User{Username: username, Email: email}
 	err = user.SetPassword(passwordStr)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, common.JSON{
-			"message": fmt.Sprintf("Failed to set password: %v", err),
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"error": "Failed to set password",
 		})
 	}
 
 	// Create auth
 	db := models.GetDb()
-	db.Create(&user)
+	err = db.Create(&user).Error
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"error": "Failed to create user. Username/Email may be duplicated.",
+		})
+	}
 
 	// Query again to get the ID
 	createdUser := &models.User{}
 	db.Where(&models.User{Username: user.Username, Email: user.Email}).First(&createdUser)
 
 	// Reply with query result
-	err = ctx.JSON(http.StatusOK, createdUser)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ctx.JSON(http.StatusOK, createdUser)
 }
