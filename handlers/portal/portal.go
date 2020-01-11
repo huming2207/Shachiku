@@ -31,6 +31,7 @@ func RegisterHandler(router *echo.Echo) {
 		AuthScheme:    "Bearer",
 	}))
 
+	group.GET("", getUser)
 	group.POST("/password", changePassword)
 
 	// Tag group
@@ -43,8 +44,8 @@ func RegisterHandler(router *echo.Echo) {
 	// Task group
 	taskGroup := group.Group("/task")
 	taskGroup.POST("", addTask)
-	taskGroup.GET("", getTaskList)
-	taskGroup.GET("/:taskId", getTaskDetail)
+	taskGroup.GET("", getAllTasks)
+	taskGroup.GET("/:taskId", getOneTask)
 	taskGroup.DELETE("/:taskId", removeTask)
 }
 
@@ -65,4 +66,20 @@ func changePassword(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, common.JSON{
 		"message": "Password updated",
 	})
+}
+
+func getUser(ctx echo.Context) error {
+	token := ctx.Get(common.JwtSection).(*jwt.Token)
+	claims := token.Claims.(*models.JwtUserClaims)
+
+	db := models.GetDb()
+	user := &models.User{}
+	db.First(&user, claims.UserID)
+
+	err := user.LoadOwnedTasks()
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, &user)
 }
