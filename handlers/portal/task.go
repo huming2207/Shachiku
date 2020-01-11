@@ -99,5 +99,14 @@ func getOneTask(ctx echo.Context) error {
 }
 
 func removeTask(ctx echo.Context) error {
-	return nil
+	db := models.GetDb()
+	taskId := ctx.Param("taskId")
+	task := &models.Task{}
+
+	err := db.Delete(&task, taskId).Error
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, &task)
 }
