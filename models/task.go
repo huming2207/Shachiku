@@ -1,12 +1,11 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type Task struct {
-	gorm.Model
+	Model
 	Title     string    `gorm:"column:title;not null" json:"title"`
 	Location  string    `gorm:"column:location" json:"location"`
 	Owner     User      `gorm:"foreignkey:OwnerID" json:"owner"`
