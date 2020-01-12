@@ -54,27 +54,7 @@ func GetDb() *gorm.DB {
 		log.Fatalln("Failed to open database: %w", err)
 	}
 
-	// Create the tables when necessary
-	if !db.HasTable(&User{}) {
-		log.Println("Creating user table...")
-		db.CreateTable(&User{})
-	} else {
-		log.Println("User table exists, skip creating...")
-	}
-
-	if !db.HasTable(&Tag{}) {
-		log.Println("Creating tag table...")
-		db.CreateTable(&Tag{})
-	} else {
-		log.Println("Tag table exists, skip creating...")
-	}
-
-	if !db.HasTable(&Task{}) {
-		log.Println("Creating task table...")
-		db.CreateTable(&Task{})
-	} else {
-		log.Println("Task table exists, skip creating...")
-	}
+	db.AutoMigrate(&User{}, &Task{}, &Tag{}, &Role{})
 
 	db.LogMode(true)
 	return db
