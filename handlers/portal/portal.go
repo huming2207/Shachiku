@@ -76,7 +76,7 @@ func getUser(ctx echo.Context) error {
 	user := &models.User{}
 	db.First(&user, claims.UserID)
 
-	err := user.LoadOwnedTasks()
+	err := user.LoadRelatedTasks()
 	if err != nil {
 		return err
 	}

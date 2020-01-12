@@ -47,13 +47,21 @@ func addTask(ctx echo.Context) error {
 
 	// Save to database
 	db := models.GetDb()
+	user := &models.User{}
+	db.First(&user, jwtClaims.UserID)
+
 	task := &models.Task{
 		Title:    title,
 		Location: location,
 		Comment:  comment,
 		StartAt:  startAt,
 		EndAt:    endAt,
-		OwnerID:  jwtClaims.UserID,
+		People: []*models.Role{
+			{
+				User:  user,
+				Level: models.Owner,
+			},
+		},
 	}
 
 	err = db.Save(&task).Error
@@ -63,7 +71,7 @@ func addTask(ctx echo.Context) error {
 		})
 	}
 
-	err = task.LoadOwner()
+	err = task.LoadPeople()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Failed to assign owner",
@@ -84,7 +92,7 @@ func getAllTasks(ctx echo.Context) error {
 	}
 
 	for idx, _ := range *tasks {
-		err = (*tasks)[idx].LoadOwner()
+		err = (*tasks)[idx].LoadPeople()
 		if err != nil {
 			return ctx.JSON(http.StatusInternalServerError, common.J{
 				"message": "Failed to load owner",
@@ -107,7 +115,7 @@ func getOneTask(ctx echo.Context) error {
 		})
 	}
 
-	err = task.LoadOwner()
+	err = task.LoadPeople()
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, common.J{
 			"message": "Failed to load owner",

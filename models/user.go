@@ -8,13 +8,12 @@ import (
 
 type User struct {
 	Model
-	Username      string  `gorm:"column:username;unique_index;not null" json:"username"`
-	Email         string  `gorm:"column:email;unique_index;not null" json:"email"`
-	Bio           string  `gorm:"column:bio;size:1024" json:"bio"`
-	Image         *string `gorm:"column:image" json:"image"`
-	Password      string  `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
-	OwnedTasks    []Task  `gorm:"foreignkey:OwnerID" json:"owned_tasks,omitempty"`
-	AttendedTasks []*Task `gorm:"many2many:users_tasks" json:"attended_tasks,omitempty"`
+	Username     string  `gorm:"column:username;unique_index;not null" json:"username"`
+	Email        string  `gorm:"column:email;unique_index;not null" json:"email"`
+	Bio          string  `gorm:"column:bio;size:1024" json:"bio"`
+	Image        *string `gorm:"column:image" json:"image"`
+	Password     string  `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
+	RelatedTasks []*Role `json:"related_tasks,omitempty"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
@@ -34,8 +33,10 @@ func (ctx *User) Update() *gorm.DB {
 	return GetDb().Save(&ctx)
 }
 
-func (ctx *User) LoadOwnedTasks() error {
-	return GetDb().Model(ctx).Related(&ctx.OwnedTasks, "OwnedTasks").Error
+func (ctx *User) LoadRelatedTasks() error {
+	return GetDb().Debug().
+		Preload("RelatedTasks", "user_id = ?", ctx.ID).
+		Preload("RelatedTasks.Task").First(ctx).Error
 }
 
 func FindOneUser(query interface{}) (User, error) {
