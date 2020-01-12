@@ -12,7 +12,7 @@ type Task struct {
 	StartAt  time.Time `gorm:"column:start_at;not null" json:"start_at"`
 	EndAt    time.Time `gorm:"column:end_at" json:"end_at"`
 	Comment  string    `gorm:"column:comment" json:"comment"`
-	Tags     []*Tag    `gorm:"many2many:users_tags" json:"tags"`
+	Tags     []*Tag    `gorm:"many2many:tags_tasks" json:"tags"`
 }
 
 func (ctx *Task) LoadPeople() error {
