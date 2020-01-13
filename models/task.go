@@ -9,7 +9,7 @@ type Task struct {
 	TimeRecords
 	Title    string    `pg:"title,notnull" json:"title"`
 	Location string    `pg:"location" json:"location"`
-	People   []*Role   `json:"people"`
+	People   []*Role   `pg:"many2many:roles" json:"people"`
 	StartAt  time.Time `pg:"start_at,notnull" json:"start_at"`
 	EndAt    time.Time `pg:"end_at" json:"end_at"`
 	Comment  string    `pg:"comment" json:"comment"`
@@ -18,5 +18,5 @@ type Task struct {
 
 func (ctx *Task) LoadPeople() error {
 	db := GetDb()
-	return db.Preload("People.User").First(ctx).Error
+	return db.Model(ctx).Column("task.*").Relation("People.User").Select()
 }

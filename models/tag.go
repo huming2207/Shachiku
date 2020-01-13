@@ -9,5 +9,5 @@ type Tag struct {
 
 func (ctx *Tag) LoadTasks() error {
 	db := GetDb()
-	return db.Preload("Tasks").First(ctx).Error
+	return db.Model(ctx).Column("tags.*").Relation("Tasks").Select()
 }

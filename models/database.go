@@ -10,7 +10,7 @@ import (
 )
 
 type TimeRecords struct {
-	CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `pg:"default:now()" json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt time.Time `pg:",soft_delete" json:"-"`
 }

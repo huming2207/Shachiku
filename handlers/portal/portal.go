@@ -55,11 +55,16 @@ func changePassword(ctx echo.Context) error {
 	claims := token.Claims.(*models.JwtUserClaims)
 
 	db := models.GetDb()
-	user := &models.User{}
-	db.First(&user, claims.UserID)
+	user := &models.User{ID: claims.UserID}
+	err := db.Select(user)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to find user (have you logged in??)",
+		})
+	}
 
 	password := ctx.FormValue("password")
-	err := validation.Validate(password, validation.Required, validation.Length(6, 64))
+	err = validation.Validate(password, validation.Required, validation.Length(6, 64))
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Password length must be between 6 to 64 characters",
@@ -72,7 +77,13 @@ func changePassword(ctx echo.Context) error {
 			"message": "Failed to generate password hash",
 		})
 	}
-	db.Save(&user)
+
+	err = db.Update(user)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Failed to save changes",
+		})
+	}
 
 	return ctx.JSON(http.StatusOK, common.J{
 		"message": "Password updated",
@@ -84,8 +95,8 @@ func getUser(ctx echo.Context) error {
 	claims := token.Claims.(*models.JwtUserClaims)
 
 	db := models.GetDb()
-	user := &models.User{}
-	db.First(&user, claims.UserID)
+	user := &models.User{ID: claims.UserID}
+	db.Select(user)
 
 	err := user.LoadRelatedTasks()
 	if err != nil {
