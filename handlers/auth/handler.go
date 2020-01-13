@@ -13,6 +13,13 @@ import (
 	"time"
 )
 
+type authResponse struct {
+	Message   string       `json:"message"`
+	Token     string       `json:"token,omitempty"`
+	ExpiresAt int64        `json:"expires_at,omitempty"`
+	User      *models.User `json:"user,omitempty"`
+}
+
 var jwtConfig *ini.Section
 
 func RegisterHandler(router *echo.Echo) {
@@ -28,14 +35,33 @@ func RegisterHandler(router *echo.Echo) {
 	group.POST("/login", login)
 }
 
+func generateJwt(userName string, userId uint) (string, int64, error) {
+	expiresAt := time.Now().Add(time.Hour).Unix()
+	claims := &models.JwtUserClaims{
+		UserName: userName,
+		UserID:   userId,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expiresAt,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	tokenStr, err := token.SignedString([]byte(jwtConfig.Key(common.JwtSecret).String()))
+	if err != nil {
+		return "", -1, err
+	}
+
+	return tokenStr, expiresAt, nil
+}
+
 func login(ctx echo.Context) error {
 	username := ctx.FormValue("username")
 	password := ctx.FormValue("password")
 
 	// Check empty or not
 	if username == "" || password == "" {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"message": "Empty or invalid request",
+		return ctx.JSON(http.StatusBadRequest, &authResponse{
+			Message: "Empty or invalid request",
 		})
 	}
 
@@ -44,47 +70,31 @@ func login(ctx echo.Context) error {
 	db := models.GetDb()
 	err := db.Model(user).Where("username = ?", username).WhereOr("email = ?", username).Select()
 	if err != nil {
-		return ctx.JSON(http.StatusNotFound, common.J{
-			"message": "User not found",
+		return ctx.JSON(http.StatusNotFound, &authResponse{
+			Message: "User not found",
 		})
 	}
 
 	// Validate password
 	match, err := user.CheckPassword(password)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, common.J{
-			"message": "Password validation failed",
+		return ctx.JSON(http.StatusInternalServerError, &authResponse{
+			Message: "Password validation failed",
 		})
 	}
 
 	if !match {
-		return ctx.JSON(http.StatusUnauthorized, common.J{
-			"message": "Password incorrect",
+		return ctx.JSON(http.StatusUnauthorized, &authResponse{
+			Message: "Password incorrect",
 		})
 	}
 
-	// Setup claims
-	expiresAt := time.Now().Add(time.Hour).Unix()
-	claims := &models.JwtUserClaims{
-		UserName: username,
-		UserID:   user.ID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiresAt,
-		},
-	}
-
 	// Generate JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
-	var tokenStr string
-	tokenStr, err = token.SignedString([]byte(jwtConfig.Key(common.JwtSecret).String()))
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, common.J{
-		"message": "OK",
-		"token":   tokenStr,
-		"expires": expiresAt,
+	tokenStr, expiresAt, err := generateJwt(username, user.ID)
+	return ctx.JSON(http.StatusOK, &authResponse{
+		Message:   "OK",
+		Token:     tokenStr,
+		ExpiresAt: expiresAt,
 	})
 }
 
@@ -96,24 +106,24 @@ func register(ctx echo.Context) error {
 	// Validate auth name
 	err := validation.Validate(username, validation.Required, validation.Length(3, 50))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"error": "Username is invalid",
+		return ctx.JSON(http.StatusBadRequest, &authResponse{
+			Message: "Username is invalid",
 		})
 	}
 
 	// Validate password
 	err = validation.Validate(passwordStr, validation.Required, validation.Length(6, 64))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"error": "Password must be between 6 to 64 characters",
+		return ctx.JSON(http.StatusBadRequest, &authResponse{
+			Message: "Password must be between 6 to 64 characters",
 		})
 	}
 
 	// Validate email
 	err = validation.Validate(email, validation.Required, is.Email)
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"error": "Email address is invalid",
+		return ctx.JSON(http.StatusBadRequest, &authResponse{
+			Message: "Email address is invalid",
 		})
 	}
 
@@ -121,8 +131,8 @@ func register(ctx echo.Context) error {
 	user := &models.User{Username: username, Email: email}
 	err = user.SetPassword(passwordStr)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, common.J{
-			"error": "Failed to set password",
+		return ctx.JSON(http.StatusInternalServerError, &authResponse{
+			Message: "Failed to set password",
 		})
 	}
 
@@ -130,11 +140,17 @@ func register(ctx echo.Context) error {
 	db := models.GetDb()
 	_, err = db.Model(user).Returning("id").Insert()
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"error": "Failed to create user. Username/Email may be duplicated.",
+		return ctx.JSON(http.StatusBadRequest, &authResponse{
+			Message: "Failed to create user. Username/Email may be duplicated.",
 		})
 	}
 
 	// Reply with query result
-	return ctx.JSON(http.StatusOK, user)
+	tokenStr, expiresAt, err := generateJwt(username, user.ID)
+	return ctx.JSON(http.StatusOK, &authResponse{
+		Message:   "OK",
+		Token:     tokenStr,
+		ExpiresAt: expiresAt,
+		User:      user,
+	})
 }
