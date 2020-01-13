@@ -5,7 +5,8 @@ import (
 )
 
 type Task struct {
-	Model
+	ID uint `pg:"id,pk"`
+	TimeRecords
 	Title    string    `pg:"title,notnull" json:"title"`
 	Location string    `pg:"location" json:"location"`
 	People   []*Role   `json:"people"`

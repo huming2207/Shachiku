@@ -2,60 +2,64 @@ package models
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/go-pg/pg/v9"
+	"github.com/go-pg/pg/v9/orm"
 	"log"
 	"shachiku/common"
 	"time"
 )
 
-type Model struct {
-	ID        uint       `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time  `json:"-"`
-	UpdatedAt time.Time  `json:"-"`
-	DeletedAt *time.Time `sql:"index" json:"-"`
+type TimeRecords struct {
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+	DeletedAt time.Time `pg:",soft_delete" json:"-"`
 }
 
-var db *gorm.DB
+var db *pg.DB
 
-func GetDb() *gorm.DB {
-	var err error
+func GetDb() *pg.DB {
 	cfg := common.GetConfig().Section(common.DatabaseSection)
-	dialect := cfg.Key(common.DatabaseDialect).String()
 
 	if db != nil {
 		return db
-	} else if dialect == "sqlite3" {
-		log.Println("Connecting to SQLite3 database")
-		db, err = gorm.Open("sqlite3", cfg.Key(common.DatabasePath).String())
-	} else if dialect == "postgres" {
-		log.Println("Connecting to PostgreSQL database")
-		db, err = gorm.Open("postgres",
-			fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+	} else {
+		db = pg.Connect(&pg.Options{
+			Addr: fmt.Sprintf("%s:%s",
 				cfg.Key(common.DatabaseHost).String(),
-				cfg.Key(common.DatabasePort).String(),
-				cfg.Key(common.DatabaseUser).String(),
-				cfg.Key(common.DatabaseName).String(),
-				cfg.Key(common.DatabasePassword).String()))
-	} else if dialect == "mysql" {
-		log.Println("Connecting to MySQL database")
-		db, err = gorm.Open("mysql",
-			fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-				cfg.Key(common.DatabaseUser).String(),
-				cfg.Key(common.DatabasePassword).String(),
-				cfg.Key(common.DatabaseHost).String(),
-				cfg.Key(common.DatabasePort).String(),
-				cfg.Key(common.DatabaseName).String()))
+				cfg.Key(common.DatabasePort).String()),
+			User:            cfg.Key(common.DatabaseUser).String(),
+			Password:        cfg.Key(common.DatabasePassword).String(),
+			Database:        cfg.Key(common.DatabaseName).String(),
+			ApplicationName: "",
+			TLSConfig:       nil,
+		})
 	}
 
+	// Check connection
+	_, err := db.Exec("SELECT 1")
 	if err != nil {
-		log.Fatalln("Failed to open database: %w", err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
 
-	db.AutoMigrate(&User{}, &Task{}, &Tag{}, &Role{})
+	err = db.CreateTable(&User{}, &orm.CreateTableOptions{IfNotExists: true})
+	if err != nil {
+		log.Fatalf("Failed to create User table: %v", err)
+	}
 
-	db.LogMode(true)
+	err = db.CreateTable(&Task{}, &orm.CreateTableOptions{IfNotExists: true})
+	if err != nil {
+		log.Fatalf("Failed to create Task table: %v", err)
+	}
+
+	err = db.CreateTable(&Tag{}, &orm.CreateTableOptions{IfNotExists: true})
+	if err != nil {
+		log.Fatalf("Failed to create Tag table: %v", err)
+	}
+
+	err = db.CreateTable(&Role{}, &orm.CreateTableOptions{IfNotExists: true})
+	if err != nil {
+		log.Fatalf("Failed to create Role table: %v", err)
+	}
+
 	return db
 }

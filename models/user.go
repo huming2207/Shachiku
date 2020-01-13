@@ -7,7 +7,8 @@ import (
 )
 
 type User struct {
-	Model
+	ID uint `pg:"id,pk"`
+	TimeRecords
 	Username     string  `pg:"username,unique,notnull" json:"username"`
 	Email        string  `pg:"email,unique,notnull" json:"email"`
 	Bio          string  `pg:"bio" json:"bio"`

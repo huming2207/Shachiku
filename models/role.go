@@ -10,7 +10,7 @@ const (
 
 // Usage: refer to https://github.com/jinzhu/gorm/issues/719
 type Role struct {
-	Model
+	TimeRecords
 	UserID uint      `pg:"user_id,pk" json:"-"`
 	User   *User     `json:"user,omitempty"`
 	TaskID uint      `pg:"task_id,pk" json:"-"`

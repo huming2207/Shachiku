@@ -1,8 +1,9 @@
 package models
 
 type Tag struct {
-	Model
-	Name  string  `pg:"name;notnull" json:"name"`
+	ID uint `pg:"id,pk"`
+	TimeRecords
+	Name  string  `pg:"name,notnull" json:"name"`
 	Tasks []*Task `pg:"many2many:tags_tasks" json:"tasks"`
 }
 
