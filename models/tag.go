@@ -2,8 +2,8 @@ package models
 
 type Tag struct {
 	Model
-	Name  string  `gorm:"column:name;not null" json:"name"`
-	Tasks []*Task `gorm:"many2many:tags_tasks" json:"tasks"`
+	Name  string  `pg:"name;notnull" json:"name"`
+	Tasks []*Task `pg:"many2many:tags_tasks" json:"tasks"`
 }
 
 func (ctx *Tag) LoadTasks() error {

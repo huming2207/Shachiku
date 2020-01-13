@@ -8,11 +8,11 @@ import (
 
 type User struct {
 	Model
-	Username     string  `gorm:"column:username;unique_index;not null" json:"username"`
-	Email        string  `gorm:"column:email;unique_index;not null" json:"email"`
-	Bio          string  `gorm:"column:bio;size:1024" json:"bio"`
-	Image        *string `gorm:"column:image" json:"image"`
-	Password     string  `gorm:"column:password;not null" json:"-"` // No JSON operations allowed for password
+	Username     string  `pg:"username,unique,notnull" json:"username"`
+	Email        string  `pg:"email,unique,notnull" json:"email"`
+	Bio          string  `pg:"bio" json:"bio"`
+	Image        *string `pg:"image" json:"image"`
+	Password     string  `pg:"password,notnull" json:"-"` // No JSON operations allowed for password
 	RelatedTasks []*Role `json:"related_tasks,omitempty"`
 }
 
