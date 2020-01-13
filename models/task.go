@@ -13,7 +13,7 @@ type Task struct {
 	StartAt  time.Time `pg:"start_at,notnull" json:"start_at"`
 	EndAt    time.Time `pg:"end_at" json:"end_at"`
 	Comment  string    `pg:"comment" json:"comment"`
-	Tags     []Tag     `pg:"many2many:tags_tasks" json:"tags"`
+	Tags     []*Tag    `pg:"many2many:tag_tasks" json:"tags"`
 }
 
 func (ctx *Task) LoadPeople() error {
