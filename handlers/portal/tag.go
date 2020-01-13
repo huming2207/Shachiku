@@ -11,7 +11,7 @@ func listTags(ctx echo.Context) error {
 	tags := &[]models.Tag{}
 	db := models.GetDb()
 
-	err := db.Find(&tags).Error
+	err := db.Model(tags).Select()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": "Failed to load tasks",

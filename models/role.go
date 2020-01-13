@@ -10,10 +10,10 @@ const (
 
 // Usage: refer to https://github.com/jinzhu/gorm/issues/719
 type Role struct {
-	Model
-	UserID uint      `gorm:"column:user_id;not null" json:"-"`
+	TimeRecords
+	UserID uint      `pg:"user_id,pk" json:"-"`
 	User   *User     `json:"user,omitempty"`
-	TaskID uint      `gorm:"column:task_id;not null" json:"-"`
+	TaskID uint      `pg:"task_id,pk" json:"-"`
 	Task   *Task     `json:"task,omitempty"`
-	Level  RoleLevel `gorm:"column:level" json:"role_level"`
+	Level  RoleLevel `pg:"level,type:smallint,notnull" json:"role_level"`
 }

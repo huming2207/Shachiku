@@ -47,8 +47,8 @@ func addTask(ctx echo.Context) error {
 
 	// Save to database
 	db := models.GetDb()
-	user := &models.User{}
-	db.First(&user, jwtClaims.UserID)
+	user := &models.User{ID: jwtClaims.UserID}
+	err = db.Select(user)
 
 	task := &models.Task{
 		Title:    title,
@@ -56,15 +56,21 @@ func addTask(ctx echo.Context) error {
 		Comment:  comment,
 		StartAt:  startAt,
 		EndAt:    endAt,
-		People: []*models.Role{
-			{
-				User:  user,
-				Level: models.Owner,
-			},
-		},
 	}
 
-	err = db.Save(&task).Error
+	_, err = db.Model(task).Returning("id").Insert()
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to save task to database",
+		})
+	}
+
+	// Create the owner
+	task.People = []*models.Role{
+		{UserID: jwtClaims.UserID, TaskID: task.ID, Level: models.Owner},
+	}
+
+	err = db.Insert(task.People[0])
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Failed to save task to database",
@@ -84,7 +90,7 @@ func addTask(ctx echo.Context) error {
 func getAllTasks(ctx echo.Context) error {
 	tasks := &[]models.Task{}
 	db := models.GetDb()
-	err := db.Find(&tasks).Error
+	err := db.Model(tasks).Select()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": "Failed to load tasks",
@@ -105,10 +111,15 @@ func getAllTasks(ctx echo.Context) error {
 
 func getOneTask(ctx echo.Context) error {
 	db := models.GetDb()
-	taskId := ctx.Param("taskId")
-	task := &models.Task{}
+	taskId, err := strconv.ParseUint(ctx.Param("taskId"), 10, 64)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": fmt.Sprintf("Task ID parameter is not a valid number"),
+		})
+	}
 
-	err := db.First(&task, taskId).Error
+	task := &models.Task{ID: uint(taskId)}
+	err = db.Select(task)
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, common.J{
 			"message": fmt.Sprintf("Task ID %s was not found", taskId),
@@ -127,13 +138,18 @@ func getOneTask(ctx echo.Context) error {
 
 func removeTask(ctx echo.Context) error {
 	db := models.GetDb()
-	taskId := ctx.Param("taskId")
-	task := &models.Task{}
+	taskId, err := strconv.ParseUint(ctx.Param("taskId"), 10, 64)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": fmt.Sprintf("Task ID parameter is not a valid number"),
+		})
+	}
 
-	err := db.Delete(&task, taskId).Error
+	task := &models.Task{ID: uint(taskId)}
+	err = db.Select(task)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
-			"message": fmt.Sprintf("Failed to delete task %s", taskId),
+			"message": fmt.Sprintf("Failed to delete task %d", taskId),
 		})
 	}
 

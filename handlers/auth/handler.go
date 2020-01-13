@@ -42,12 +42,19 @@ func login(ctx echo.Context) error {
 	// Find auth by auth name or email
 	user := &models.User{}
 	db := models.GetDb()
-	db.First(&user, "username = ? OR email = ?", username, username)
+	err := db.Model(user).Where("username = ?", username).WhereOr("email = ?", username).Select()
+	if err != nil {
+		return ctx.JSON(http.StatusNotFound, common.J{
+			"message": "User not found",
+		})
+	}
 
 	// Validate password
 	match, err := user.CheckPassword(password)
 	if err != nil {
-		return err
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Password validation failed",
+		})
 	}
 
 	if !match {
@@ -121,17 +128,13 @@ func register(ctx echo.Context) error {
 
 	// Create auth
 	db := models.GetDb()
-	err = db.Create(&user).Error
+	_, err = db.Model(user).Returning("id").Insert()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"error": "Failed to create user. Username/Email may be duplicated.",
 		})
 	}
 
-	// Query again to get the ID
-	createdUser := &models.User{}
-	db.Where(&models.User{Username: user.Username, Email: user.Email}).First(&createdUser)
-
 	// Reply with query result
-	return ctx.JSON(http.StatusOK, createdUser)
+	return ctx.JSON(http.StatusOK, user)
 }
