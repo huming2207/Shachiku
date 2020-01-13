@@ -34,9 +34,7 @@ func (ctx *User) Update() error {
 }
 
 func (ctx *User) LoadRelatedTasks() error {
-	return GetDb().Model(ctx).
-		Column("user.*").
-		Relation("RelatedTasks").Where("user_id = ?", ctx.ID).
-		Relation("RelatedTasks.Task").
+	return GetDb().Model(&ctx.RelatedTasks).
+		Relation("Task").Where("user_id = ?", ctx.ID).
 		Select()
 }

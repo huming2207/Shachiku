@@ -17,7 +17,5 @@ type Task struct {
 }
 
 func (ctx *Task) LoadPeople() error {
-	db := GetDb()
-	err := db.Model(&ctx.People).Relation("User").First()
-	return err
+	return GetDb().Model(&ctx.People).Relation("User").First()
 }
