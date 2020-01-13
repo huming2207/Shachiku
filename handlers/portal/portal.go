@@ -96,9 +96,14 @@ func getUser(ctx echo.Context) error {
 
 	db := models.GetDb()
 	user := &models.User{ID: claims.UserID}
-	db.Select(user)
+	err := db.Select(user)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Failed to get user (have you logged in??)",
+		})
+	}
 
-	err := user.LoadRelatedTasks()
+	err = user.LoadRelatedTasks()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": "Failed to load related tasks",
