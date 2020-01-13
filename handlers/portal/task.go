@@ -56,15 +56,21 @@ func addTask(ctx echo.Context) error {
 		Comment:  comment,
 		StartAt:  startAt,
 		EndAt:    endAt,
-		People: []*models.Role{
-			{
-				User:  user,
-				Level: models.Owner,
-			},
-		},
 	}
 
-	err = db.Insert(task)
+	_, err = db.Model(task).Returning("id").Insert()
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Failed to save task to database",
+		})
+	}
+
+	// Create the owner
+	task.People = []*models.Role{
+		{UserID: jwtClaims.UserID, TaskID: task.ID, Level: models.Owner},
+	}
+
+	err = db.Insert(task.People[0])
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Failed to save task to database",

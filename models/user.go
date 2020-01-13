@@ -6,14 +6,14 @@ import (
 )
 
 type User struct {
-	ID uint `pg:"id,pk"`
+	ID uint `pg:"id,pk"  json:"id"`
 	TimeRecords
 	Username     string  `pg:"username,unique,notnull" json:"username"`
 	Email        string  `pg:"email,unique,notnull" json:"email"`
 	Bio          string  `pg:"bio" json:"bio"`
 	Image        *string `pg:"image" json:"image"`
 	Password     string  `pg:"password,notnull" json:"-"` // No JSON operations allowed for password
-	RelatedTasks []*Role `pg:"many2many:roles" json:"related_tasks,omitempty"`
+	RelatedTasks []*Role `json:"related_tasks,omitempty"`
 }
 
 func (ctx *User) SetPassword(pass string) (err error) {
