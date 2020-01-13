@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-pg/pg/v9"
 	"github.com/go-pg/pg/v9/orm"
@@ -13,6 +14,17 @@ type TimeRecords struct {
 	CreatedAt time.Time `pg:"default:now()" json:"-"`
 	UpdatedAt time.Time `json:"-"`
 	DeletedAt time.Time `pg:",soft_delete" json:"-"`
+}
+
+type dbLogger struct{}
+
+func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
+	return c, nil
+}
+
+func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
+	log.Println(q.FormattedQuery())
+	return nil
 }
 
 var db *pg.DB
@@ -61,5 +73,6 @@ func GetDb() *pg.DB {
 		log.Fatalf("Failed to create Role table: %v", err)
 	}
 
+	db.AddQueryHook(dbLogger{})
 	return db
 }
