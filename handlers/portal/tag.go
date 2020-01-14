@@ -40,9 +40,8 @@ func addTag(ctx echo.Context) error {
 		})
 	}
 
-	db := models.GetDb()
 	tag := &models.Tag{Name: tagName}
-	_, err := db.Model(tag).Returning("id").Insert()
+	err := tag.Create()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": "Failed to save tag",
@@ -61,8 +60,7 @@ func listTagDetail(ctx echo.Context) error {
 	}
 
 	tag := &models.Tag{ID: uint(tagId)}
-	db := models.GetDb()
-	err = db.Select(tag)
+	err = tag.Read()
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, common.J{
 			"message": fmt.Sprintf("Cannot find tag with ID %d", tagId),
@@ -81,8 +79,7 @@ func deleteTag(ctx echo.Context) error {
 	}
 
 	tag := &models.Tag{ID: uint(tagId)}
-	db := models.GetDb()
-	err = db.Delete(tag)
+	err = tag.Delete()
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, common.J{
 			"message": fmt.Sprintf("Cannot delete tag with ID %d", tagId),

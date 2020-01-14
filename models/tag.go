@@ -17,3 +17,29 @@ func (ctx *Tag) LoadTasks() error {
 	db := GetDb()
 	return db.Model(ctx).Column("task.*").Relation("Tasks").Select()
 }
+
+func (ctx *Tag) Create() error {
+	db := GetDb()
+	_, err := db.Model(ctx).Returning("id").Insert()
+	return err
+}
+
+func (ctx *Tag) Read() error {
+	db := GetDb()
+	err := db.Select(ctx)
+	if err != nil {
+		return err
+	}
+
+	return ctx.LoadTasks()
+}
+
+func (ctx *Tag) Update() error {
+	db := GetDb()
+	return db.Update(ctx)
+}
+
+func (ctx *Tag) Delete() error {
+	db := GetDb()
+	return db.Delete(ctx)
+}
