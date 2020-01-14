@@ -146,7 +146,7 @@ func removeTask(ctx echo.Context) error {
 	}
 
 	task := &models.Task{ID: uint(taskId)}
-	err = db.Select(task)
+	err = db.Delete(task)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": fmt.Sprintf("Failed to delete task %d", taskId),
