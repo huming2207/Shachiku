@@ -68,6 +68,11 @@ func GetDb() *pg.DB {
 		log.Fatalf("Failed to create Tag table: %v", err)
 	}
 
+	err = db.CreateTable(&TagTask{}, &orm.CreateTableOptions{IfNotExists: true})
+	if err != nil {
+		log.Fatalf("Failed to create TagTask table: %v", err)
+	}
+
 	err = db.CreateTable(&Role{}, &orm.CreateTableOptions{IfNotExists: true})
 	if err != nil {
 		log.Fatalf("Failed to create Role table: %v", err)
