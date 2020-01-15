@@ -8,6 +8,7 @@ import (
 	"shachiku/common"
 	"shachiku/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,22 @@ func addTask(ctx echo.Context) error {
 	title := ctx.FormValue("title")
 	location := ctx.FormValue("location")
 	comment := ctx.FormValue("comment")
+	tags := strings.Split(ctx.FormValue("tags"), ",")
+	var tagIds []uint64
+
+	// Parse Tag ID
+	if len(tags) != 0 {
+		for _, tagIdStr := range tags {
+			tagId, err := strconv.ParseUint(tagIdStr, 10, 64)
+			if err != nil {
+				return ctx.JSON(http.StatusBadRequest, common.J{
+					"message": fmt.Sprintf("Cannot parse Tag ID %s", tagIdStr),
+				})
+			} else {
+				tagIds = append(tagIds, tagId)
+			}
+		}
+	}
 
 	// Validate title
 	if title == "" {
@@ -77,10 +94,27 @@ func addTask(ctx echo.Context) error {
 		})
 	}
 
+	// Add tags
+	for _, tagId := range tagIds {
+		err = db.Insert(&models.TagTask{TaskID: task.ID, TagID: uint(tagId)})
+		if err != nil {
+			return ctx.JSON(http.StatusBadRequest, common.J{
+				"message": fmt.Sprintf("Cannot bind tag with ID %d", tagId),
+			})
+		}
+	}
+
 	err = task.LoadPeople()
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
+		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": "Failed to assign owner",
+		})
+	}
+
+	err = task.LoadTags()
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Failed to assign tags",
 		})
 	}
 
