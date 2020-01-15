@@ -16,13 +16,6 @@ type TimeRecords struct {
 	DeletedAt time.Time `pg:",soft_delete" json:"-"`
 }
 
-type CrudModel interface {
-	Create() error
-	Read() error
-	Update() error
-	Delete() error
-}
-
 type dbLogger struct{}
 
 func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
