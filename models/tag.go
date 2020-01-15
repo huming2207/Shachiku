@@ -7,12 +7,6 @@ type Tag struct {
 	Tasks []*Task `pg:"many2many:tag_tasks" json:"tasks"`
 }
 
-type TagTask struct {
-	TagID  uint `pg:",pk"`
-	TaskID uint `pg:",pk"`
-	TimeRecords
-}
-
 func (ctx *Tag) LoadTasks() error {
 	db := GetDb()
 	return db.Model(ctx).
