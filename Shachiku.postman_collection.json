@@ -1,0 +1,455 @@
+{
+	"info": {
+		"_postman_id": "38f46020-7561-45d3-a302-0a96f377cdfa",
+		"name": "Shachiku",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create account",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{email}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "test1232",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123123123",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "test15623@qq.com",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "127.0.0.1:3000/auth/login",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update password",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "test000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "127.0.0.1:3000/portal/password",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"portal",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a task",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "title",
+							"value": "Test 101",
+							"type": "text"
+						},
+						{
+							"key": "location",
+							"value": "Siberia",
+							"type": "text"
+						},
+						{
+							"key": "comment",
+							"value": "Idk",
+							"type": "text"
+						},
+						{
+							"key": "start_at",
+							"value": "1578708394",
+							"type": "text"
+						},
+						{
+							"key": "end_at",
+							"value": "1578718394",
+							"type": "text"
+						},
+						{
+							"key": "tags",
+							"value": "1,5",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "127.0.0.1:3000/portal/task",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"portal",
+						"task"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get task by ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6InRlc3QxMjM1NiIsImV4cCI6MTU3ODczMDcwMn0.-2r48-m9csUDZPvD7ELOiBfKlLChkcelwW4s5uDVteRoeiA9pFXN8ifrPT8HqSgfaJgEgy-B742lG_BsvzNGqQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:3000/portal/task/2",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"portal",
+						"task",
+						"2"
+					]
+				},
+				"description": "Replace the \"1\" with the Task ID you want"
+			},
+			"response": []
+		},
+		{
+			"name": "Get portal",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6InRlc3QxMjMyIiwiZXhwIjoxNTc4OTE3ODkzfQ.mUtx0xBBSUn0Ti1UzEquKPSaGwvvtWDz7Sz5jxfZCDQPeLSlmMjeyU8bpDzF3eaDNTqQBCCs90SqgEMqxXOkug",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/portal",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"portal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a tag",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "test3",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/portal/tag",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"portal",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a tag",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6InRlc3QxMjMyIiwiZXhwIjoxNTc5MDYxNTMxfQ.FWv6-ttg62VvTMLetluYXMFwDhAd0k1X3PoDrOcXDN1BOPjpLjefPBp-xic7CjJmkzXU5n_6jybkMxwHaDF1Cg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/portal/tag/3",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"portal",
+						"tag",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a tag (with details)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6InRlc3QxMjMyIiwiZXhwIjoxNTc5MDY4Nzg2fQ.MLav07Nm9yOIrrkLY6_cZRxoh7CL40EtPt-NK-8KtGWjH9mLP46p3GlbDXynsTo_kunRmiUVoL-2AZAnNzpr2Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/portal/tag",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"portal",
+						"tag"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6InRlc3QxMjM1NiIsImV4cCI6MTU3ODc0NzA3Nn0.XRyMcmORQwxTgDFYpErRCAwtdgWMi456UgevZTiP2GH7h7j0kbtOoQHsIYsNAGQ4S5a94syT6yVmJg9YMO6K4Q",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "792ea6df-da60-4c29-83e4-366dbbaf232f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b7e4d755-fe9a-4c73-86df-3d909bf43e60",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "4bbfb637-796d-41a9-99f9-f2a4172e4096",
+			"key": "base_url",
+			"value": "127.0.0.1:3000",
+			"type": "string"
+		},
+		{
+			"id": "7341fe23-98ee-4768-b708-a389db715001",
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "df266d4b-5b68-42d1-87ec-5e5564bc24fd",
+			"key": "username",
+			"value": "test123",
+			"type": "string"
+		},
+		{
+			"id": "9d9738e0-6a69-4fa1-b110-d7e7ab2e1701",
+			"key": "password",
+			"value": "rand0mPasswd",
+			"type": "string"
+		},
+		{
+			"id": "c7636c56-760d-4b9e-bbab-8302d42525f8",
+			"key": "email",
+			"value": "test@nowhere.su",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
