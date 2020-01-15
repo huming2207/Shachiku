@@ -20,7 +20,8 @@ require (
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.5 // indirect
 	golang.org/x/crypto v0.0.0-20200109152110-61a87790db17 // indirect
-	golang.org/x/sys v0.0.0-20200107162124-548cf772de50 // indirect
+	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
+	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
 	gopkg.in/ini.v1 v1.51.1
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
