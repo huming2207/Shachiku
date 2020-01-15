@@ -1,10 +1,12 @@
 package portal
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"shachiku/common"
 	"shachiku/models"
+	"strconv"
 )
 
 func listTags(ctx echo.Context) error {
@@ -14,7 +16,7 @@ func listTags(ctx echo.Context) error {
 	err := db.Model(tags).Select()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
-			"message": "Failed to load tasks",
+			"message": "Failed to load tags",
 		})
 	}
 
@@ -31,13 +33,58 @@ func listTags(ctx echo.Context) error {
 }
 
 func addTag(ctx echo.Context) error {
-	return nil
+	tagName := ctx.FormValue("name")
+	if tagName == "" {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Tag name cannot be empty",
+		})
+	}
+
+	tag := &models.Tag{Name: tagName}
+	err := tag.Create()
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, common.J{
+			"message": "Failed to save tag",
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, tag)
 }
 
 func listTagDetail(ctx echo.Context) error {
-	return nil
+	tagId, err := strconv.ParseUint(ctx.Param("tagId"), 10, 64)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Tag ID must be a valid number",
+		})
+	}
+
+	tag := &models.Tag{ID: uint(tagId)}
+	err = tag.Read()
+	if err != nil {
+		return ctx.JSON(http.StatusNotFound, common.J{
+			"message": fmt.Sprintf("Cannot find tag with ID %d", tagId),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, tag)
 }
 
 func deleteTag(ctx echo.Context) error {
-	return nil
+	tagId, err := strconv.ParseUint(ctx.Param("tagId"), 10, 64)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, common.J{
+			"message": "Tag ID must be a valid number",
+		})
+	}
+
+	tag := &models.Tag{ID: uint(tagId)}
+	err = tag.Delete()
+	if err != nil {
+		return ctx.JSON(http.StatusNotFound, common.J{
+			"message": fmt.Sprintf("Cannot delete tag with ID %d", tagId),
+		})
+	}
+
+	return ctx.JSON(http.StatusOK, tag)
 }
