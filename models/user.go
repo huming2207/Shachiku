@@ -29,12 +29,25 @@ func (ctx *User) CheckPassword(pass string) (match bool, err error) {
 	return argon2id.ComparePasswordAndHash(pass, ctx.Password)
 }
 
-func (ctx *User) Update() error {
-	return GetDb().Update(ctx)
-}
-
 func (ctx *User) LoadRelatedTasks() error {
 	return GetDb().Model(&ctx.RelatedTasks).
 		Relation("Task").Where("user_id = ?", ctx.ID).
 		Select()
+}
+
+func (ctx *User) Create() error {
+	_, err := GetDb().Model(ctx).Returning("id").Insert()
+	return err
+}
+
+func (ctx *User) Read() error {
+	return GetDb().Select(ctx)
+}
+
+func (ctx *User) Update() error {
+	return GetDb().Update(ctx)
+}
+
+func (ctx *User) Delete() error {
+	return GetDb().Delete(ctx)
 }

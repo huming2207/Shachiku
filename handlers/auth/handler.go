@@ -137,8 +137,7 @@ func register(ctx echo.Context) error {
 	}
 
 	// Create auth
-	db := models.GetDb()
-	_, err = db.Model(user).Returning("id").Insert()
+	err = user.Create()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, &authResponse{
 			Message: "Failed to create user. Username/Email may be duplicated.",
