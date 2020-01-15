@@ -15,7 +15,11 @@ type TagTask struct {
 
 func (ctx *Tag) LoadTasks() error {
 	db := GetDb()
-	return db.Model(ctx).Column("task.*").Relation("Tasks").Select()
+	return db.Model(ctx).
+		Column("tag.*").
+		Where("tag.id = ?", ctx.ID).
+		Relation("Tasks").
+		First()
 }
 
 func (ctx *Tag) Create() error {
