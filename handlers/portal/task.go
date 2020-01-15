@@ -63,10 +63,6 @@ func addTask(ctx echo.Context) error {
 	jwtClaims := jwtToken.Claims.(*models.JwtUserClaims)
 
 	// Save to database
-	db := models.GetDb()
-	user := &models.User{ID: jwtClaims.UserID}
-	err = db.Select(user)
-
 	task := &models.Task{
 		Title:    title,
 		Location: location,
@@ -75,28 +71,22 @@ func addTask(ctx echo.Context) error {
 		EndAt:    endAt,
 	}
 
-	_, err = db.Model(task).Returning("id").Insert()
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, common.J{
-			"message": "Failed to save task to database",
-		})
-	}
-
 	// Create the owner
 	task.People = []*models.Role{
 		{UserID: jwtClaims.UserID, TaskID: task.ID, Level: models.Owner},
 	}
 
-	err = db.Insert(task.People[0])
+	err = task.Create()
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
 			"message": "Failed to save task to database",
 		})
 	}
 
-	// Add tags
+	// Bind tags
 	for _, tagId := range tagIds {
-		err = db.Insert(&models.TagTask{TaskID: task.ID, TagID: uint(tagId)})
+		tagTask := &models.TagTask{TaskID: task.ID, TagID: uint(tagId)}
+		err = tagTask.Create()
 		if err != nil {
 			return ctx.JSON(http.StatusBadRequest, common.J{
 				"message": fmt.Sprintf("Cannot bind tag with ID %d", tagId),
@@ -138,13 +128,19 @@ func getAllTasks(ctx echo.Context) error {
 				"message": "Failed to load owner",
 			})
 		}
+
+		err = (*tasks)[idx].LoadTags()
+		if err != nil {
+			return ctx.JSON(http.StatusInternalServerError, common.J{
+				"message": "Failed to load tags",
+			})
+		}
 	}
 
 	return ctx.JSON(http.StatusOK, tasks)
 }
 
 func getOneTask(ctx echo.Context) error {
-	db := models.GetDb()
 	taskId, err := strconv.ParseUint(ctx.Param("taskId"), 10, 64)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
@@ -153,17 +149,10 @@ func getOneTask(ctx echo.Context) error {
 	}
 
 	task := &models.Task{ID: uint(taskId)}
-	err = db.Select(task)
+	err = task.Read()
 	if err != nil {
 		return ctx.JSON(http.StatusNotFound, common.J{
-			"message": fmt.Sprintf("Task ID %s was not found", taskId),
-		})
-	}
-
-	err = task.LoadPeople()
-	if err != nil {
-		return ctx.JSON(http.StatusNotFound, common.J{
-			"message": "Failed to load owner",
+			"message": fmt.Sprintf("Task ID %d was not found", taskId),
 		})
 	}
 
@@ -171,7 +160,6 @@ func getOneTask(ctx echo.Context) error {
 }
 
 func removeTask(ctx echo.Context) error {
-	db := models.GetDb()
 	taskId, err := strconv.ParseUint(ctx.Param("taskId"), 10, 64)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, common.J{
@@ -180,7 +168,7 @@ func removeTask(ctx echo.Context) error {
 	}
 
 	task := &models.Task{ID: uint(taskId)}
-	err = db.Delete(task)
+	err = task.Delete()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, common.J{
 			"message": fmt.Sprintf("Failed to delete task %d", taskId),

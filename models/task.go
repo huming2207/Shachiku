@@ -28,13 +28,14 @@ func (ctx *Task) LoadTags() error {
 }
 
 func (ctx *Task) Create() error {
+	db := GetDb()
 	_, err := db.Model(ctx).Returning("id").Insert()
 	if err != nil {
 		return err
 	}
 
-	if ctx.People != nil {
-		ctx.People[0].TaskID = ctx.ID // Assign the actual task ID
+	if ctx.People != nil && len(ctx.People) != 0 {
+		ctx.People[0].TaskID = ctx.ID // Assign the returned ID
 		err = db.Insert(ctx.People[0])
 		if err != nil {
 			return err
@@ -51,7 +52,12 @@ func (ctx *Task) Read() error {
 		return err
 	}
 
-	return ctx.LoadPeople()
+	err = ctx.LoadPeople()
+	if err != nil {
+		return err
+	}
+
+	return ctx.LoadTags()
 }
 
 func (ctx *Task) Update() error {
