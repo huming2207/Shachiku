@@ -13,7 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/labstack/echo/v4 v4.1.13
+	github.com/labstack/echo/v4 v4.1.14
 	github.com/lib/pq v1.3.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.2+incompatible // indirect
 	github.com/smartystreets/assertions v1.0.1 // indirect
