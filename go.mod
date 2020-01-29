@@ -8,7 +8,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.0.0-20191128021309-1d7a30a10f73 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
-	github.com/go-pg/pg/v9 v9.1.1
+	github.com/go-pg/pg/v9 v9.1.2
 	github.com/go-pg/urlstruct v0.2.10 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
