@@ -13,8 +13,11 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZm
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 h1:Yzb9+7DPaBjB8zlTR87/ElzFsnQfuHnVUVqpZZIcV5Y=
 github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5/go.mod h1:a2zkGnVExMxdzMo3M0Hi/3sEU+cWnZpSni0O6/Yb/P0=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
+github.com/go-ozzo/ozzo-validation v3.6.0+incompatible h1:msy24VGS42fKO9K1vLz82/GeYW1cILu7Nuuj1N3BBkE=
 github.com/go-ozzo/ozzo-validation/v3 v3.8.1 h1:PcDzf3lgoWlFW8cxEpqD04zmRczXjn1CUN/AFPUJZK8=
 github.com/go-ozzo/ozzo-validation/v3 v3.8.1/go.mod h1:Bf9HRAgaSCiSPUJ6ueMChbSdCWKeAH4pyW3jctEGwGU=
+github.com/go-ozzo/ozzo-validation/v4 v4.0.0 h1:tZtJsQQJOBh6Cl5ni10Xqv53LzO+8A7iI0/X5ap9TnE=
+github.com/go-ozzo/ozzo-validation/v4 v4.0.0/go.mod h1:cQmT+ki0c76Pk/pd0QohBsQ6BcqjeMM7Nkxi/kEdzAA=
 github.com/go-pg/pg v8.0.6+incompatible h1:Hi7yUJ2zwmHFq1Mar5XqhCe3NJ7j9r+BaiNmd+vqf+A=
 github.com/go-pg/pg/v9 v9.0.0-beta.14/go.mod h1:T2Sr6bpTCOr2lUqOUMiXLMJqZHSUBKk1LdgSqjwhZfA=
 github.com/go-pg/pg/v9 v9.0.3/go.mod h1:Tm/Q3Vt6gdQOH6TTN1H/xLlIXc+Qrka7TZ6uREtu/eA=
