@@ -10,7 +10,7 @@ require (
 	github.com/go-pg/pg/v9 v9.1.4
 	github.com/gopherjs/gopherjs v0.0.0-20191106031601-ce3c9ade29de // indirect
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/labstack/echo/v4 v4.1.15
+	github.com/labstack/echo/v4 v4.1.16
 	github.com/lestrrat-go/bufferpool v0.0.0-20180220091733-e7784e1b3e37 // indirect
 	github.com/lestrrat-go/ical v0.0.0-20190317233631-91af071bafbc // indirect
 	github.com/pkg/errors v0.9.1 // indirect
