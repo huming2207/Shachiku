@@ -3,7 +3,7 @@ module shachiku
 go 1.13
 
 require (
-	github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802
+	github.com/alexedwards/argon2id v0.0.0-20200420065805-90c52fcb498a
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
