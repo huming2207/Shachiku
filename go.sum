@@ -2,6 +2,8 @@ github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802 h1:RwMM1q/QSK
 github.com/alexedwards/argon2id v0.0.0-20190612080829-01a59b2b8802/go.mod h1:4dsm7ufQm1Gwl8S2ss57u+2J7KlxIL2QUmFGlGtWogY=
 github.com/alexedwards/argon2id v0.0.0-20200420065805-90c52fcb498a h1:AdMvl6qmXj9++lRNWniVDbJ9JH3nLfhp/xealsY+fwY=
 github.com/alexedwards/argon2id v0.0.0-20200420065805-90c52fcb498a/go.mod h1:GFtu6vaWaRJV5EvSFaVqgq/3Iq95xyYElBV/aupGzUo=
+github.com/alexedwards/argon2id v0.0.0-20200522061839-9369edc04b05 h1:votg1faEmwABhCeJ4tiBrvwk4BWftQGkEtFy5iuI7rU=
+github.com/alexedwards/argon2id v0.0.0-20200522061839-9369edc04b05/go.mod h1:GFtu6vaWaRJV5EvSFaVqgq/3Iq95xyYElBV/aupGzUo=
 github.com/arran4/golang-ical v0.0.0-20200125013057-acb7a6972c90 h1:IEI9jMjDvnTmlM7ywvxB9GpIPy6U5RrxzqNTmGxgols=
 github.com/arran4/golang-ical v0.0.0-20200125013057-acb7a6972c90/go.mod h1:OvKAaLVUQD5P9ZCgnI5qbpkX8fil6yAnorhTaVZnVWk=
 github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 h1:zV3ejI06GQ59hwDQAvmK1qxOQGB3WuVTRoY0okPTAv0=
